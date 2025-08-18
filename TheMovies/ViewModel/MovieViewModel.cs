@@ -25,8 +25,7 @@ namespace TheMovies.ViewModel {
             movies = new ObservableCollection<Movie>(FileMovieRepository.movies);
         }
 
-        public RelayCommand AddMovie = new RelayCommand(execute => FileMovieRepository.AddMovie(selectedMovie));
-        public RelayCommand UpdateMovie = new RelayCommand(execute => FileMovieRepository.UpdateMovie(selectedMovie));
+        public RelayCommand AddMovie = new RelayCommand(execute => FileMovieRepository.AddMovie(selectedMovie));        
         public RelayCommand DeleteMovie = new RelayCommand(execute => FileMovieRepository.DeleteMovie(selectedMovie));
     }
 }
