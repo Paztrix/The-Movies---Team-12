@@ -11,17 +11,17 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TheMovies.ViewModel;
 
-namespace TheMovies.View
-{
+namespace TheMovies.View {
     /// <summary>
     /// Interaction logic for MainView.xaml
     /// </summary>
-    public partial class MainView : Window
-    {
-        public MainView()
-        {
+    public partial class MainView : Window {
+        public MainView() {
             InitializeComponent();
+            MovieViewModel mw = new MovieViewModel();
+            DataContext = mw;
         }
     }
 }

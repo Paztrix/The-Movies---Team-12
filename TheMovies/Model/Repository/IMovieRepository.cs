@@ -6,5 +6,7 @@ using System.Threading.Tasks;
 
 namespace TheMovies.Model.Repository {
     public interface IMovieRepository {
+        List<Movie> GetAllMovies();
+        void AddMovie(Movie movie);
     }
 }

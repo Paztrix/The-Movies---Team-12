@@ -160,13 +160,13 @@
                 <DataGrid Grid.Row="2" IsReadOnly="True">
                     <DataGrid.Columns>
                         <!-- TODO bind 1: Binding={Binding Title} -->
-                        <DataGridTextColumn Header="Titel" Width="*"/>
+                        <DataGridTextColumn Header="Titel" Binding="{Binding Title}" Width="*"/>
 
                         <!-- TODO bind 1: Binding={Binding Genre} -->
-                        <DataGridTextColumn Header="Genre" Width="220"/>
+                        <DataGridTextColumn Header="Genre" Binding="{Binding Genre}" Width="220"/>
 
                         <!-- TODO bind 1: Binding={Binding Duration} -->
-                        <DataGridTextColumn Header="Varighed" Width="160"/>
+                        <DataGridTextColumn Header="Varighed" Binding="{Binding Duration}" Width="160"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
@@ -185,7 +185,8 @@
                     Style="{StaticResource PrimaryButtonStyle}"
                     Content="Tilføj film"
                     Padding="20,10"
-                    Margin="0,5,0,5"/>
+                    Margin="0,5,0,5"
+                    Command="{Binding AddMovieCommand}"/>
         </Grid>
     </Grid>
 </Window>
