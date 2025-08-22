@@ -4,27 +4,55 @@ using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
-namespace TheMovies.Model.Repository {
-    public class FileMovieRepository : IMovieRepository 
+namespace TheMovies.Model.Repository
+{
+    public class FileMovieRepository : IMovieRepository
     {
-        public static List<Movie> movies = new List<Movie>();
-
-
-        public void SaveToFile(List<Movie> movies) { }
-
-        public void LoadFromFile () { }
-
-        public static void AddMovie(Movie movie) 
+        private readonly string _filePath;
+        public FileMovieRepository(string filePath)
         {
-            movies.Add(movie);
+            _filePath = filePath;
         }
 
-        public static void DeleteMovie(Movie movie)
+        public List<Movie> GetAllMovies()
         {
-            movies.Remove(movie);
-        }    
+            var movies = new List<Movie>();
+            if (!File.Exists(_filePath)) return movies;
 
+            var lines = File.ReadAllLines(_filePath);
+            foreach (var line in lines.Skip(1))
+            {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+
+                var columns = line.Split(';');
+                if (columns.Length < 3) continue;
+
+                if (!TimeSpan.TryParse(columns[1], out var duration)) continue;            
+                    
+                movies.Add(new Movie
+                {
+                    Title = columns[0],
+                    Duration = duration,
+                    Genre = columns[2]
+                });
+            }
+            return movies;
+
+        }
+
+        public void AddMovie(Movie movie)
+        {
+            bool fileExists = File.Exists(_filePath);
+            using (var writer = new StreamWriter(_filePath, append: true))
+            {
+                if (!fileExists)
+                {
+                    writer.WriteLine("Title;Duration;Genre");
+                }
+                writer.WriteLine($"{movie.Title};{movie.Duration};{movie.Genre}");
+            }
+        }
     }
-
 }
