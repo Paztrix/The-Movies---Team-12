@@ -5,44 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TheMovies.Model {
-
-
-    public class Movie
-    {
+    public class Movie {
         public string Title { get; set; }
-        public TimeSpan Duration { get; set; }
         public string Genre { get; set; }
+        public TimeSpan Duration { get; set; }
 
-        public Movie(string title, TimeSpan duration, string genre)
-        {
+        public Movie(string title, string genre, TimeSpan duration) {
             Title = title;
-            Duration = duration;
             Genre = genre;
+            Duration = duration;
         }
 
-        public override string ToString()
-        {
-            return string.Join(";",
-                Title,
-                Duration.ToString(@"hh\:mm"),
-                Genre
-            );
-
+        public override string ToString() {
+            return $"{Title},{Genre},{Duration}";
         }
 
-        public static Movie FromString(string line)
-        {
-            var parts = line.Split(';');
+        public static Movie FromString(string line) {
+            var parts = line.Split(",");
+            string title = parts[0].Trim().Trim('"');
+            string genre = parts[1].Trim().Trim('"');
+            TimeSpan duration = TimeSpan.ParseExact(parts[2].Trim(), @"hh\:mm", null);
 
-            if (parts.Length != 3 ||
-                !TimeSpan.TryParseExact(parts[1], @"hh\:mm", null, out TimeSpan duration))
-
-            {
-                throw new ArgumentException("Invalid movie format", nameof(line));
-            }
-
-            return new Movie(parts[0], duration, parts[2]);
-
+            return new Movie(title, genre, duration);
         }
     }
 }

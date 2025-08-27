@@ -15,13 +15,14 @@ using TheMovies.ViewModel;
 
 namespace TheMovies.View {
     /// <summary>
-    /// Interaction logic for MainView.xaml
+    /// Interaction logic for AddMovieView.xaml
     /// </summary>
-    public partial class MainView : Window {
-        public MainView() {
+    public partial class AddMovieView : Window {
+        public AddMovieViewModel ViewModel { get; }
+        public AddMovieView() {
             InitializeComponent();
-            MovieViewModel mw = new MovieViewModel();
-            DataContext = mw;
+            ViewModel = new AddMovieViewModel(() => Close());
+            DataContext = ViewModel;
         }
     }
 }

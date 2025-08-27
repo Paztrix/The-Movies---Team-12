@@ -1,57 +1,65 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
+using TheMovies.Model;
+using TheMovies.Model.Repository;
 
-namespace TheMovies.Model.Repository
-{
-    public class FileMovieRepository : IMovieRepository
-    {
-        private readonly string _filePath;
-        public FileMovieRepository(string filePath)
-        {
+namespace TheMovies.Model.Repository {
+    public class FileMovieRepository : IMovieRepository {
+        private readonly string _filePath = "Filmliste.CSV";
+        public FileMovieRepository(string filePath) {
             _filePath = filePath;
         }
 
-        public List<Movie> GetAllMovies()
-        {
+        //Henter alle film fra CSV-filen
+        public List<Movie> GetAllMovies() {
             var movies = new List<Movie>();
+            //Hvis filen ikke findes så returneres en tom liste
             if (!File.Exists(_filePath)) return movies;
 
-            var lines = File.ReadAllLines(_filePath);
-            foreach (var line in lines.Skip(1))
-            {
-                if (string.IsNullOrWhiteSpace(line)) continue;
+            //Parser til af læse CSV-filen
+            using var parser = new TextFieldParser(_filePath) {
+                TextFieldType = FieldType.Delimited //Angiver at filen er kommasepareret
+            };
+            parser.SetDelimiters(","); //Field-separator er komma
+            parser.HasFieldsEnclosedInQuotes = true; //Fields kan være omsluttet af ""
 
-                var columns = line.Split(';');
-                if (columns.Length < 3) continue;
+            parser.ReadFields(); //Læser første linje (Header) og ignorerer den
 
-                if (!TimeSpan.TryParse(columns[1], out var duration)) continue;            
-                    
-                movies.Add(new Movie
-                {
-                    Title = columns[0],
-                    Duration = duration,
-                    Genre = columns[2]
-                });
+            //Læser restenm af CSV-filen linje for linje
+            while (!parser.EndOfData) {
+                var fields = parser.ReadFields();
+                //Spring linjen over hvis den er ugyldig (Mere end 3 fields)
+                if (fields == null || fields.Length < 3) continue;
+
+                var title = fields[0].Trim(); //Titel
+                var genre = fields[1].Trim(); //Genre
+                //Forsøger at parse filmens varighed i formatet hh:mm
+                if (TimeSpan.TryParseExact(fields[2].Trim(), @"hh\:mm", null, out var duration)) {
+                    //Tilføjer filmen til listen
+                    movies.Add(new Movie(title, genre, duration));
+                }
             }
             return movies;
-
         }
 
-        public void AddMovie(Movie movie)
-        {
+        // Tilføjer en ny film til CSV-filen
+        public void AddMovie(Movie movie) {
             bool fileExists = File.Exists(_filePath);
-            using (var writer = new StreamWriter(_filePath, append: true))
-            {
-                if (!fileExists)
-                {
-                    writer.WriteLine("Title;Duration;Genre");
+
+            using (var writer = new StreamWriter(_filePath, append: true)) {
+                // Hvis filen ikke findes, skriv header først
+                if (!fileExists) {
+                    writer.WriteLine("\"Title\",\"Genre\",\"Duration\"");
                 }
-                writer.WriteLine($"{movie.Title};{movie.Duration};{movie.Genre}");
+
+                // Brug komma-separator og anførselstegn omkring tekstfelter
+                writer.WriteLine($"\"{movie.Title}\",\"{movie.Genre}\",{movie.Duration:hh\\:mm}");
             }
         }
     }
